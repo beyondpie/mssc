@@ -1,15 +1,14 @@
 Package: mssc
-Title: What the Package Does (One Line, Title Case)
+Title: Multiple-sample differential analysis for single-cell RNA sequencing data
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = Songpeng,
+           family = Zu,
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+           email = "szu@health.ucsd.edu",
+           comment = c(ORCID = "0000-0001-9753-5623"))
+Description: Differential expression analysis for single-cell RNA-sequencing data with multiple sample correction.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
