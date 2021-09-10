@@ -1,9 +1,12 @@
-##' .. content for \description{} (no empty lines) ..
+##' Create InitMssc object
 ##'
-##' .. content for \details{} ..
-##' @title 
-##' @return 
-##' @author Songpeng Zu
+##' Initialize a InitMssc object in order to initialize the parameters
+##' of MSSC.
+##' 
+##' @return  InitMssc
+##' @export
+##' @example
+##' new_InitMssc()
 new_InitMssc <- function() {
   structure(list(
     nb_model = NULL,
