@@ -1,6 +1,6 @@
 Package: mssc
 Title: Multiple-sample differential analysis for single-cell RNA sequencing data
-Version: 0.0.0.9000
+Version: 0.1
 Authors@R: 
     person(given = "Songpeng",
            family = "Zu",
