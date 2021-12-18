@@ -104,13 +104,16 @@ initNBParamWithCondBatch <- function(y, s, cond, ind,
   invisible(result)
 }
 
-
+#' @param mu numeric vector, mean expression for genes
+#' @param min_var scalar, lower bound of estimated variance of mu
+#' @return numeric vector with four elements:
+#' mean, variance, alpha, beta (param of inv-gamma distribution for var of mu)
 #' @export
-fitGeneGlobalMeanPriorParams <- function(mu) {
+fitGeneGlobalMeanPriorParams <- function(mu, min_var = 4.0) {
   m <- median(mu)
   ngene <- length(mu)
   v <- sum((mu - m)^2) / ngene
-  v <- max(v, self$min_varofmu)
+  v <- max(v, min_var)
   ## varofmu prior follows a inv-gamma dist
   ## est hy based on posterior
   alpha <- 1.0 + ngene / 2
@@ -118,8 +121,16 @@ fitGeneGlobalMeanPriorParams <- function(mu) {
   invisible(c(m, v, alpha, beta))
 }
 
-
-
+#' Get parameters for the prior of dispersion.
+#' We assume the dispersion follows a log-Normal distribution.
+#' @param r numeric vector, dispersions for genes
+#' @param min_var scalar, lower bound of estimated var of r.
+#' @return numeric vector with four elements:
+#' mean, variance, alpha, beta (param of inv-gamma distribution for var of logr)
+#' @export
+fitDispersionParams <- function(r, min_var = 4.0){
+  invisible(fitGeneGlobalMeanPriorParams(mu = log(r), min_var = min_var))
+}
 
 
 
