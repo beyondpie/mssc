@@ -104,8 +104,9 @@ initNBParamWithCondBatch <- function(y, s, cond, ind,
   invisible(result)
 }
 
+#' NOTE previous name: est_varofmu
 #' @param mu numeric vector, mean expression for genes
-#' @param min_var scalar, lower bound of estimated variance of mu
+#' @param min_var scalar, lower bound of estimated variance of umu
 #' @return numeric vector with four elements:
 #' mean, variance, alpha, beta (param of inv-gamma distribution for var of mu)
 #' @export
@@ -123,6 +124,7 @@ fitGeneGlobalMeanPriorParams <- function(mu, min_var = 4.0) {
 
 #' Get parameters for the prior of dispersion.
 #' We assume the dispersion follows a log-Normal distribution.
+#' NOTE previous name: est_varofr
 #' @param r numeric vector, dispersions for genes
 #' @param min_var scalar, lower bound of estimated var of r.
 #' @return numeric vector with four elements:
@@ -132,8 +134,76 @@ fitDispersionParams <- function(r, min_var = 4.0){
   invisible(fitGeneGlobalMeanPriorParams(mu = log(r), min_var = min_var))
 }
 
+#' Estimate parameters of inv-gamma dist as the prior
+#' for genewise conditional expression.
+#' NOTE previous name: est_varofcond
+#' @param mucond matrix, ngene by ncond, gene expression level under conditions.
+#' @param min_varofcond scalar, lower bound for the estimated variance.
+#' @return matrix, ngene by 3 params,
+#' including variance of the gene expression under that condition,
+#' alpha, beta params for the prior of the variance (inv-gamma distribution).
+#' We treat initial means of the gene expressions as zeros.
+#' @export
+fitGenewiseCondPriorParams <- function(mucond,
+                                       min_varofcond = 0.25) {
+  ncond <- ncol(mucond)
+  ngene <- nrow(mucond)
+  ## each condiiton has its own variance.
+  ## which follows a inv-gamma prior
+  t_d <- vapply(
+    1:ncond, function(i) {
+      t <- max(abs(mucond[, i]))
+      ## set a variance not that small
+      v <- max(t^2, min_varofcond)
+      ## assume the mean of mucond is around 0.0
+      ## then use posterior of inv-gamma to set the hyper priors
+      alpha <- 1.0 + ngene / 2
+      beta <- 1.0 + sum(mucond[, i]^2) / 2
+      invisible(c(v, alpha, beta))
+    },
+    FUN.VALUE = rep(1.0, 3)
+  )
+  return(invisible(t(t_d)))
+}
 
-
-
-
+#' NOTE previous name: est_varofind
+#' @param muind matrix, ngene by nind
+#' @param min_varofind scalar, lower bound of estimated variance of individuals.
+#' @param min_tau2 scalar, lower bound of estimated tau2.
+#' @return list of two elements
+#' - est_varofind: matrix, nind by 4
+#'   - mean, variance, alpha and beta (inv-gamma dist as the prior of the variance)
+#' - est_tau2: vector of 3 elements
+#'   - tau2, tau2_alpha, tau2_beta (assume muinds follow a N(0.0, tau), taus is std.)
+#' @export
+fitGenewiseBatchPriorParams <- function(muind,
+                                        min_varofind = 0.25,
+                                        min_tau2 = 0.25){
+  nind <- ncol(muind)
+  ngene <- nrow(muind)
+  t_d <- vapply(
+    1:nind, function(i) {
+      m <- median(muind[, i])
+      v <- max(sum((muind[, i] - m)^2) / ngene, min_varofind)
+      alpha <- 1.0 + ngene / 2
+      beta <- 1.0 + sum((muind[, i] - m)^2) / 2
+      invisible(c(m, v, alpha, beta))
+    },
+    FUN.VALUE = rep(1.0, 4)
+  )
+  ## shape: nind by 4
+  r <- t(t_d)
+  ## assume muinds follow a N(0.0, tau) (tau is sd)
+  tau2 <- max(max(abs(r[, 1]))^2, min_tau2)
+  ## assume tau2 has a inv-gamma prior
+  ## use posterior to set up the hp.
+  tau2_alpha <- 1.0 + nind / 2
+  tau2_beta <- 1.0 + sum(muind[, 1]^2) / 2
+  return(invisible(
+    list(
+      est_varofind = r,
+      est_tau2 = c(tau2, tau2_alpha, tau2_beta)
+    )
+  ))
+}
 
