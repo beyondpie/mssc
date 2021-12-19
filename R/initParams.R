@@ -214,7 +214,7 @@ fitGenewiseBatchPriorParams <- function(muind,
 #' @param s numeric vector, length of ncell, normalzing/scaling factor for cells
 #' @param cond integer vector, length of ncell, which cond the cell belongs to,
 #' start from 1.
-#' @param ind integer vector, length of nind, which individual the cell belongs to,
+#' @param ind integer vector, length of ncell, which individuals cells belong to,
 #' start from 1.
 #' @return list of four elements
 #' - mgsnb: matrix, ngene by 2 + ncond + nind
