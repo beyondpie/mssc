@@ -10,10 +10,10 @@ normLogMean <- function(y, s) {
   if (any(y) < 0) {
     stop("numeric vector y should be no less than zero.")
   }
-  if(sum(y) == 0){
+  if (sum(y) == 0) {
     stop("numeric vector y should have at least one element larger than zero.")
   }
-  if(any(s <= 0) ) {
+  if (any(s <= 0)) {
     stop("normalizing constant s should be all larger than zero.")
   }
   mu <- log(mean(y)) - log(median(s))
@@ -65,7 +65,7 @@ initNBParamWithCondBatch <- function(y, s, cond, ind,
   if (any(y) < 0) {
     stop("numeric vector y should be no less than zero.")
   }
-  if(sum(y) == 0){
+  if (sum(y) == 0) {
     ## if y are all zeros, then we use the default ones.
     ## TODO: maybe we can set muind as the mean of muind from our model,
     ## which can be directly estimated by a pure non-mucond effect model.
@@ -76,31 +76,31 @@ initNBParamWithCondBatch <- function(y, s, cond, ind,
   init_mur <- initNBParam(y, s)
   result$mu <- init_mur$mu
   result$r <- init_mur$r
-  
+
   result$mucond <- vapply(1:ncond, function(i) {
-      ss <- s[cond == i]
-      yy <- y[cond == i]
-      if(sum(yy) == 0) {
-        return(0.0)
-      }
-      t <- normLogMean(y = yy, s = ss)
-      init_mucond <- t - result$mu
-      ## Since fitting is hard when fix r, and limited data
-      ## we directly use the init_mucond
-      invisible(init_mucond)
-    },
-    FUN.VALUE = 0.0
+    ss <- s[cond == i]
+    yy <- y[cond == i]
+    if (sum(yy) == 0) {
+      return(0.0)
+    }
+    t <- normLogMean(y = yy, s = ss)
+    init_mucond <- t - result$mu
+    ## Since fitting is hard when fix r, and limited data
+    ## we directly use the init_mucond
+    invisible(init_mucond)
+  },
+  FUN.VALUE = 0.0
   )
-  
+
   result$muind <- vapply(1:nind, function(i) {
-      yy <- y[ind == i]
-      if (sum(yy) == 0) {
-        return(0.0)
-      }
-      t <- normLogMean(y = yy, s = s[ind == i])
-      return(invisible(t - result$mu - result$mucond[cond[ind == i][1]]))
-    },
-    FUN.VALUE = 0.0
+    yy <- y[ind == i]
+    if (sum(yy) == 0) {
+      return(0.0)
+    }
+    t <- normLogMean(y = yy, s = s[ind == i])
+    return(invisible(t - result$mu - result$mucond[cond[ind == i][1]]))
+  },
+  FUN.VALUE = 0.0
   )
   invisible(result)
 }
@@ -131,7 +131,7 @@ fitGeneGlobalMeanPriorParams <- function(mu, min_var = 4.0) {
 #' @return numeric vector with four elements:
 #' mean, variance, alpha, beta (param of inv-gamma distribution for var of logr)
 #' @export
-fitDispersionParams <- function(r, min_var = 4.0){
+fitDispersionParams <- function(r, min_var = 4.0) {
   invisible(fitGeneGlobalMeanPriorParams(mu = log(r), min_var = min_var))
 }
 
@@ -179,7 +179,7 @@ fitGenewiseCondPriorParams <- function(mucond,
 #' @export
 fitGenewiseBatchPriorParams <- function(muind,
                                         min_varofind = 0.25,
-                                        min_tau2 = 0.25){
+                                        min_tau2 = 0.25) {
   nind <- ncol(muind)
   ngene <- nrow(muind)
   t_d <- vapply(
@@ -227,34 +227,40 @@ fitGenewiseNBModel <- function(cnt, s, cond, ind,
                                default_mu = 0.0, default_r = 20,
                                min_var = 4.0, min_varofcond = 0.25,
                                min_varofind = 0.25, min_tau2 = 0.25) {
-  if(any(s) == 0) {
+  if (any(s) == 0) {
     stop("Normalizing factor s should have no zeros.")
   }
   ncond <- max(cond)
   nind <- max(ind)
   ngene <- nrow(cnt)
   t_init_mgsnb <- vapply(1:ngene, function(i) {
-      r <- initNBParamWithCondBatch(
-        y = cnt[i, ], s = s,
-        cond = cond, ind = ind,
-        default_mu = default_mu, default_r = default_r
-      )
-      invisible(unlist(r))
-    },
-    FUN.VALUE = rep(0.0, 2 + ncond + nind)
+    r <- initNBParamWithCondBatch(
+      y = cnt[i, ], s = s,
+      cond = cond, ind = ind,
+      default_mu = default_mu, default_r = default_r
+    )
+    invisible(unlist(r))
+  },
+  FUN.VALUE = rep(0.0, 2 + ncond + nind)
   )
   ## shape: ngene by 2 + ncond + nind
   init_mgsnb <- t(t_init_mgsnb)
-  init_varofmu <- fitGeneGlobalMeanPriorParams(mu = init_mgsnb[, 1],
-                                               min_var = min_var)
-  init_varofr <- fitGeneGlobalMeanPriorParams(mu = log(init_mgsnb[, 2]),
-                                              min_var = min_var)
+  init_varofmu <- fitGeneGlobalMeanPriorParams(
+    mu = init_mgsnb[, 1],
+    min_var = min_var
+  )
+  init_varofr <- fitGeneGlobalMeanPriorParams(
+    mu = log(init_mgsnb[, 2]),
+    min_var = min_var
+  )
   init_varofcond <- fitGenewiseCondPriorParams(
     mucond = init_mgsnb[, 3:(2 + ncond)],
-    min_varofcond = min_varofcond)
+    min_varofcond = min_varofcond
+  )
   init_varofind <- fitGenewiseBatchPriorParams(
     muind = init_mgsnb[, (2 + ncond + 1):ncol(init_mgsnb)],
-    min_varofind = min_varofind, min_tau2 = min_tau2)
+    min_varofind = min_varofind, min_tau2 = min_tau2
+  )
   return(invisible(list(
     mgsnb = init_mgsnb,
     mu = init_varofmu,
