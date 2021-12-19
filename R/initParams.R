@@ -43,6 +43,7 @@ initNBParam <- function(y, s, min_r) {
 
 #' Fit mu, mucond, muind for Negative Binomial with scaling.
 #' No more Stan script based.
+#' NOTE previous name: fit_mgsnb
 #' @param cond vector of integer, start from 1
 #' @param ind vector of integer, start from 1
 #' @return list of four-named element, mu, r, mucond, muind
@@ -207,3 +208,58 @@ fitGenewiseBatchPriorParams <- function(muind,
   ))
 }
 
+#' A summary fit function for Genewise Negative Binomial Model
+#' NOTE previous name: fit_mgsnb
+#' @param cnt matrix, count matrix size of ngene by ncell
+#' @param s numeric vector, length of ncell, normalzing/scaling factor for cells
+#' @param cond integer vector, length of ncell, which cond the cell belongs to,
+#' start from 1.
+#' @param ind integer vector, length of nind, which individual the cell belongs to,
+#' start from 1.
+#' @return list of four elements
+#' - mgsnb: matrix, ngene by 2 + ncond + nind
+#' - mu: output of fitGeneGlobalMeanPriorParams
+#' - logr: output of fitGeneGlobalMeanPriorParams
+#' - cond: output of fitGenewiseCondPriorParams
+#' - ind: output of fitGenewiseBatchPriorParams
+#' @export
+fitGenewiseNBModel <- function(cnt, s, cond, ind,
+                               default_mu = 0.0, default_r = 20,
+                               min_var = 4.0, min_varofcond = 0.25,
+                               min_varofind = 0.25, min_tau2 = 0.25) {
+  if(any(s) == 0) {
+    stop("Normalizing factor s should have no zeros.")
+  }
+  ncond <- max(cond)
+  nind <- max(ind)
+  ngene <- nrow(cnt)
+  t_init_mgsnb <- vapply(1:ngene, function(i) {
+      r <- initNBParamWithCondBatch(
+        y = cnt[i, ], s = s,
+        cond = cond, ind = ind,
+        default_mu = default_mu, default_r = default_r
+      )
+      invisible(unlist(r))
+    },
+    FUN.VALUE = rep(0.0, 2 + ncond + nind)
+  )
+  ## shape: ngene by 2 + ncond + nind
+  init_mgsnb <- t(t_init_mgsnb)
+  init_varofmu <- fitGeneGlobalMeanPriorParams(mu = init_mgsnb[, 1],
+                                               min_var = min_var)
+  init_varofr <- fitGeneGlobalMeanPriorParams(mu = log(init_mgsnb[, 2]),
+                                              min_var = min_var)
+  init_varofcond <- fitGenewiseCondPriorParams(
+    mucond = init_mgsnb[, 3:(2 + ncond)],
+    min_varofcond = min_varofcond)
+  init_varofind <- fitGenewiseBatchPriorParams(
+    muind = init_mgsnb[, (2 + ncond + 1):ncol(init_mgsnb)],
+    min_varofind = min_varofind, min_tau2 = min_tau2)
+  return(invisible(list(
+    mgsnb = init_mgsnb,
+    mu = init_varofmu,
+    logr = init_varofr,
+    cond = init_varofcond,
+    ind = init_varofind
+  )))
+}
