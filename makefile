@@ -15,4 +15,4 @@ doc: $(RCODES)
 	Rscript -e "devtools::document(pkg = '.')"
 
 install:
-	Rscript -e 'devtools::install_github("beyondpie/mssc")'
+	Rscript -e 'remotes::install_github("beyondpie/mssc")'
