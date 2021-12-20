@@ -368,3 +368,105 @@ extractDraws <- function(mssc2, param, genenms = NULL, method = "vi") {
       invisible(NA)
     } ) ## end of trycatch block
 }
+
+#' Extract all parameters' samples from MSSC2 Model.
+#' @param mssc2 MSSC2 object
+#' @param genenms NULL or vector of strings.
+#' @param method string, "vi" or "opt"
+#' @return list, samples for different parameters.
+#' @export
+extractDrawsAll <- function(mssc2, genenms = NULL, method = "vi") {
+  if (class(mssc2) != "MSSC2") {
+    stop("Input mssc2 is not an objet of MSSC2 S3 class.")
+  }
+  if (method == "vi") {
+    fit <- mssc2$vi
+  } else {
+    fit <- mssc2$opt
+  }
+  if(is.null(fit)) {
+    stop(paste(method, " is null. Might becuase it hasn't been run or have troubles."))
+  }
+  est_params <- lapply(mssc2$all_params_nms, function(nm) {
+    extractDraws(mssc2 = mssc2,genenms = genenms,method = method)
+  })
+  names(est_params) <- mssc2$all_params_nms
+  invisible(est_params)
+}
+
+#' Evaluate delta mean between two conditions.
+#' @param mucond 3-dim arrays, nsample by ngene by ncond
+#' @param twoHotVector integer vector, like (1,-1) or (0, 0, -1, 1, 0),
+#' the two conditions we want to compare, one is 1 and the other is -1.
+#' @return numeric vector, length of ngene, delta mean for different genes.
+#' @export
+evalDeltaMean <- function(mucond, twoHotVec) {
+  if(sum(twoHotVec) != 0) {
+    stop("Set 1 and -1 for the two conditions we are interested.")
+  }
+  if(dim(mucond)[3] != length(twoHotVec)) {
+    stop(paste("Mucond has", dim(mucond)[3], "conditions;",
+               "twoHotVec has",length(twoHotVec), "conditions."))
+  }
+  n <- dim(mucond)[1]
+  tmp <- t(vapply(1:n, function(i) {
+    mucond[i, , ] %*% twoHotVec
+  }, FUN.VALUE = rep(0.0, dim(mucond)[2])))
+  r <- colMeans(tmp)
+  if(!is.null(dimnames(mucond)[[2]])) {
+    names(r) <- dimnames(mucond)[[2]]
+  }
+  invisible(r)
+}
+
+#' Evaluate t statistics and p-value between two conditions.
+#' @param mucond 3-dim arrays, nsample by ngene by ncond
+#' @param twoHotVector integer vector, like (1,-1) or (0, 0, -1, 1, 0),
+#' the two conditions we want to compare, one is 1 and the other is -1.
+#' @param alternative string, default "two.sided"
+#' @param paired bool, default FALSE
+#' @param var.equal bool, default FALSE
+#' @return matrix, ngene by 2 (t statistics and pvalue in order)
+#' NA will be used for t statistics when some troubles happend in t.test,
+#' in this case, p-value is 1.0
+#' @export
+evalTstat <- function(mucond, twoHotVec,
+                      alternative = "two.sided",
+                      paired = TRUE,
+                      var.equal = FALSE) {
+  if (sum(twoHotVec) != 0) {
+    stop("Set 1 and -1 for the two conditions we are interested.")
+  }
+  if (dim(mucond)[3] != length(twoHotVec)) {
+    stop(paste(
+      "Mucond has", dim(mucond)[3], "conditions;",
+      "twoHotVec has", length(twoHotVec), "conditions."
+    ))
+  }
+  group1 <- mucond[, , twoHotVec == 1]
+  group2 <- mucond[, , twoHotVec == -1]
+  ngene <- dim(mucond)[2]
+  tstat <- vapply(1:ngene, function(i) {
+    tryCatch({
+        s <- t.test(
+          x = group1[, i], y = group2[, i],
+          alternative = alternative,
+          paired = paired,
+          var.equal = var.equal
+        )
+        invisible(c(s$statistic, s$p.value))
+      }, error = function(e) {
+        warning(e)
+        return(invisible(NA, 1.0))
+      })
+  }, FUN.VALUE = c(0.0, 1.0))
+  r <- t(tstat)
+  colnames(r) <- c("tstat", "pvalue")
+  if(!is.null(dimnames(mucond)[[2]])) {
+    rownames(r) <- dimnames(mucond)[[2]]
+  }
+  invisible(r)
+}
+
+
+
