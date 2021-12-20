@@ -44,6 +44,7 @@ compileStanModel <- function(model_path,
   invisible(r)
 }
 
+#' Get names of vector in cmdstanr.
 #' @param nm string, name of variable in stan script
 #' @param n integer, length of the variable.
 #' @param l string, left bracket, default "["
@@ -56,7 +57,7 @@ getNameOfVectorFromCmdstanr <- function(nm = "MuInd", n = 10L, l = "[", r = "]")
   }, FUN.VALUE = "MuInd[1]"))
 }
 
-
+#' Get names of matrix in cmdstanr.
 #' @param nm string, name of variable in stan script
 #' @param nr integer, nrow of the variable.
 #' @param nc integer, ncolof the variable.

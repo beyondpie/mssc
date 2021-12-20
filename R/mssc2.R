@@ -312,6 +312,7 @@ PSIS <- function(mssc2, takelog = FALSE, donormalize = TRUE) {
   invisible(list(psis = r, weight = w))
 }
 
+#' Extract draws/samples from the MSSC2 model
 #' @param mssc2 MSSC2 object
 #' @param param string, name of the parameter we want to extract
 #' @param genenms vector of string, length of ngene
@@ -554,6 +555,7 @@ runGLMAP <- function(mssc2, data) {
   return(mssc2)
 }
 
+#' Extract draws/samples from the generalized linear model.
 #' @param mssc2 MSSC2 object
 #' @param param string, name of the parameter we want to extract
 #' @param genenms vector of string, length of ngene
