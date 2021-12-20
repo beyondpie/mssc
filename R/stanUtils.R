@@ -64,7 +64,7 @@ getNameOfVectorFromCmdstanr <- function(nm = "MuInd", n = 10L, l = "[", r = "]")
 #' @param r string, right brackt, default "]"
 #' @return vector of string
 #' @export
-getNameOfMatrixFromCmdstanr <- function(nm = "MuInd", nr, nc, l = "[". r = "]") {
+getNameOfMatrixFromCmdstanr <- function(nm = "MuInd", nr, nc, l = "[",r = "]") {
   r <- rep("", nr * nc)
   for (i in 1:nr) {
     for (j in 1:nc) {
