@@ -16,7 +16,7 @@ normLogMean <- function(y, s) {
   if (any(s <= 0)) {
     stop("normalizing constant s should be all larger than zero.")
   }
-  mu <- log(mean(y)) - log(median(s))
+  mu <- log(stats::mean(y)) - log(stats::median(s))
   invisible(mu)
 }
 
@@ -34,7 +34,7 @@ normLogMean <- function(y, s) {
 initNBParam <- function(y, s, min_r) {
   mu <- normLogMean(y = y, s = s)
   ## v equals to m + m^2/r
-  v <- var(y)
+  v <- stats::var(y)
   m <- mean(y)
   ## dispersion
   r <- ifelse(v > m, m^2 / (v - m), min_r)
@@ -112,7 +112,7 @@ initNBParamWithCondBatch <- function(y, s, cond, ind,
 #' mean, variance, alpha, beta (param of inv-gamma distribution for var of mu)
 #' @export
 fitGeneGlobalMeanPriorParams <- function(mu, min_var = 4.0) {
-  m <- median(mu)
+  m <- stats::median(mu)
   ngene <- length(mu)
   v <- sum((mu - m)^2) / ngene
   v <- max(v, min_var)
@@ -184,7 +184,7 @@ fitGenewiseBatchPriorParams <- function(muind,
   ngene <- nrow(muind)
   t_d <- vapply(
     1:nind, function(i) {
-      m <- median(muind[, i])
+      m <- stats::median(muind[, i])
       v <- max(sum((muind[, i] - m)^2) / ngene, min_varofind)
       alpha <- 1.0 + ngene / 2
       beta <- 1.0 + sum((muind[, i] - m)^2) / 2

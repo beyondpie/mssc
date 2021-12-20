@@ -290,6 +290,9 @@ runMAP <- function(mssc2, data) {
 #'
 #' This is specific for variational inference.
 #'
+#' @param mssc2 MSSC2 object
+#' @param takelog bool, default FALSE
+#' @param donormalize bool, default TRUE
 #' @return list of two elements:
 #' - psis: output of loo:psis
 #' - weight: output of loo::weights.importance_sampling
@@ -303,12 +306,12 @@ PSIS <- function(mssc2, takelog = FALSE, donormalize = TRUE) {
   }
   ## TODO: check the meaninig below
   log_ratios <- mssc2$vi$lp()-mssc2$vi$lp_approx()
-  capture.output(suppressWarnings(r <- loo::psis(
+  utils::capture.output(suppressWarnings(r <- loo::psis(
     log_ratios = log_ratios,
     r_eff = NA
   )))
   ## call loo::weights.importance_sampling
-  w <- weights(r, log = takelog, normalize = donormalize)
+  w <- stats::weights(r, log = takelog, normalize = donormalize)
   invisible(list(psis = r, weight = w))
 }
 
@@ -454,7 +457,7 @@ evalTstat <- function(mucond, twoHotVec,
   ngene <- dim(mucond)[2]
   tstat <- vapply(1:ngene, function(i) {
     tryCatch({
-        s <- t.test(
+        s <- stats::t.test(
           x = group1[, i], y = group2[, i],
           alternative = alternative,
           paired = paired,

@@ -7,6 +7,13 @@ Weights are normalized and NOT in scale level (what do I mean?) by default.}
 \usage{
 PSIS(mssc2, takelog = FALSE, donormalize = TRUE)
 }
+\arguments{
+\item{mssc2}{MSSC2 object}
+
+\item{takelog}{bool, default FALSE}
+
+\item{donormalize}{bool, default TRUE}
+}
 \value{
 list of two elements:
 \itemize{
