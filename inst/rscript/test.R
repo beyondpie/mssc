@@ -1,93 +1,104 @@
-test <- function() {
-  pbmc <- readRDS("snb_pool_ref_pbmc.rds")
-  nind <- max(pbmc$ind)
-  model <- High2$new(
-    stan_snb_path = here::here("src", "mssc", "stan", "snb.stan"),
-    stan_high2_path = here::here("src", "mssc", "stan", "mssc_2-0.stan"),
-    stan_glm_path = here::here("src", "mssc", "stan", "glm.stan"),
-    nind = nind,
-    tol_rel_obj = 0.0001,
-    adapt_engaged = FALSE
-  )
+#' Test MSSC2
+#'
+#' A modified data set from a public PBMC single-cell RNA sequencing data,
+#' which has 200 genes, 6799 cells from 10 individuals and 2 conditions, is used.
+#' @format A list with 6 elements
+#' \describe{
+#'   \item{sumcnt}{total number of counts per cell}
+#'   \item{s}{normaling constant per cell}
+#'   \item{ind}{which individual a cell belongs to, start from 1.}
+#'   \item{cond}{which condition a cell belongs to, start from 1.}
+#'   \item{y2c}{count matrix, ngene by ncell}
+#'   \item{est_snb_mat}{matrix, estimated parameters for different genes}
+#' }
+#' @source A public PBMC single-cell RNA sequencing data
 
-  init_params <- model$init_params(
-    cnt = pbmc$y2c[1:10, ],
-    s = pbmc$s,
-    cond = pbmc$cond,
-    ind = pbmc$ind
-  )
+pbmc <- readRDS(system.file("extdata", "refPBMC.rds", package = "mssc", mustWork = TRUE))
+nind <- max(pbmc$ind)
+model <- High2$new(
+  stan_snb_path = here::here("src", "mssc", "stan", "snb.stan"),
+  stan_high2_path = here::here("src", "mssc", "stan", "mssc_2-0.stan"),
+  stan_glm_path = here::here("src", "mssc", "stan", "glm.stan"),
+  nind = nind,
+  tol_rel_obj = 0.0001,
+  adapt_engaged = FALSE
+)
 
-  data <- model$to_model_data(
-    cnt = pbmc$y2c[1:10, ],
-    s = pbmc$s,
-    cond = pbmc$cond,
-    ind = pbmc$ind,
-    hp = init_params$hp
-  )
+init_params <- model$init_params(
+  cnt = pbmc$y2c[1:10, ],
+  s = pbmc$s,
+  cond = pbmc$cond,
+  ind = pbmc$ind
+)
 
-  ## variational inference
-  model$run(data = data, list_wrap_ip = list(init_params$ip))
+data <- model$to_model_data(
+  cnt = pbmc$y2c[1:10, ],
+  s = pbmc$s,
+  cond = pbmc$cond,
+  ind = pbmc$ind,
+  hp = init_params$hp
+)
 
-  est_params <- model$extract_draws_all(
-    ngene = 10,
-    genenms = rownames(pbmc$y2c[1:10, ])
-  )
-  str(est_params)
+## variational inference
+model$run(data = data, list_wrap_ip = list(init_params$ip))
 
-  mucond <- model$extract_draws(
-    param = "mucond", ngene = 10,
-    genenms = rownames(pbmc$y2c[1:10, ])
-  )
-  rankings <- model$get_ranking_statistics(
-    mucond = mucond,
-    two_hot_vec = c(1, -1)
-  )
-  str(rankings)
+est_params <- model$extract_draws_all(
+  ngene = 10,
+  genenms = rownames(pbmc$y2c[1:10, ])
+)
+str(est_params)
 
-  psis <- model$psis()
-  print(psis$psis)
-  rankings <- model$get_ranking_statistics(
-    mucond = mucond,
-    two_hot_vec = c(1, -1)
-  )
-  str(rankings)
+mucond <- model$extract_draws(
+  param = "mucond", ngene = 10,
+  genenms = rownames(pbmc$y2c[1:10, ])
+)
+rankings <- model$get_ranking_statistics(
+  mucond = mucond,
+  two_hot_vec = c(1, -1)
+)
+str(rankings)
 
-  ## optimization
-  model$run_opt(data = data, list_wrap_ip = list(init_params$ip))
-  est_params <- model$extract_draws_all(
-    ngene = 10,
-    genenms = rownames(pbmc$y2c[1:10, ]),
-    method = "opt"
-  )
-  str(est_params)
+psis <- model$psis()
+print(psis$psis)
+rankings <- model$get_ranking_statistics(
+  mucond = mucond,
+  two_hot_vec = c(1, -1)
+)
+str(rankings)
 
-  mucond <- model$extract_draws(
-    param = "mucond", ngene = 10,
-    genenms = rownames(pbmc$y2c[1:10, ]),
-    method = "opt"
-  )
-  rankings <- model$get_ranking_statistics(
-    mucond = mucond,
-    two_hot_vec = c(1, -1)
-  )
-  str(rankings)
+## optimization
+model$run_opt(data = data, list_wrap_ip = list(init_params$ip))
+est_params <- model$extract_draws_all(
+  ngene = 10,
+  genenms = rownames(pbmc$y2c[1:10, ]),
+  method = "opt"
+)
+str(est_params)
 
-  ## test glm
-  init_params_of_glm <- model$init_glm_params(cnt = pbmc$y2c[1:10,],
-                                             s = pbmc$s,
-                                             cond = pbmc$cond,
-                                             ind = pbmc$ind)
-  model$run_glm_opt(data = data, list_wrap_ip = list(init_params_of_glm))
-  est_params_of_glm <- model$extract_draws_all_from_glm
-  mucond_of_glm <- model$extract_draws_from_glm(
-    param = "mucond", ngene = 10,
-    genenms = rownames(pbmc$y2c[1:10, ])
-  )
-  ranking_from_glm <- model$get_opt_ranking_statistic(
-    mucond = mucond_of_glm,
-    two_hot_vec = c(1, -1)
-  )
-  str(ranking_from_glm)
-}
+mucond <- model$extract_draws(
+  param = "mucond", ngene = 10,
+  genenms = rownames(pbmc$y2c[1:10, ]),
+  method = "opt"
+)
+rankings <- model$get_ranking_statistics(
+  mucond = mucond,
+  two_hot_vec = c(1, -1)
+)
+str(rankings)
 
-test()
+## test glm
+init_params_of_glm <- model$init_glm_params(cnt = pbmc$y2c[1:10,],
+                                            s = pbmc$s,
+                                            cond = pbmc$cond,
+                                            ind = pbmc$ind)
+model$run_glm_opt(data = data, list_wrap_ip = list(init_params_of_glm))
+est_params_of_glm <- model$extract_draws_all_from_glm
+mucond_of_glm <- model$extract_draws_from_glm(
+  param = "mucond", ngene = 10,
+  genenms = rownames(pbmc$y2c[1:10, ])
+)
+ranking_from_glm <- model$get_opt_ranking_statistic(
+  mucond = mucond_of_glm,
+  two_hot_vec = c(1, -1)
+)
+str(ranking_from_glm)
