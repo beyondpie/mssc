@@ -55,3 +55,25 @@ You can also use the R command below to find the script.
 test_script = system.file("rscript", "test.R", package = "mssc", mustWork = TRUE)
 ```
 Then you can run this script to test if you can run mssc without errors.
+
+## Rank differentially expressed genes
+Currently, we use the function `evalDeltaMean` to get the differential
+mean under two conditions. The absolute value could reflect the effect
+size. 
+
+- When we use variational inference, the function returns the average
+  differential mean from the samples of conditional gene expression
+  levels from the approximated joint
+  posterior distribution. For each gene, we have one such value.
+  
+- When we use optimization, the function returns the directly
+  differential value from the estimated conditional gene expression
+  levels.
+
+Currently, we have no the corresponding p-value like statistics to
+measure the differential expression.
+
+## Generalized linear model
+A simple way to model the batch effect for different cells is to treat
+the batch as one covariant in a generalized linear model, which we
+have implemented as a control for mssc.
