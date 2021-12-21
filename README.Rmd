@@ -33,4 +33,10 @@ if(!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 remotes::install_github("beyondpie/mssc")
+## mssc => cmdstanr => cmdstan  (=>: depends on)
+## so we also need to install cmdstan, which is not an R packge, but cmdline Stan tool.
+## Prefer to use cmdstanr to install it since cmdstanr will then remember where the cmdstan is,
+## otherwise you have to install cmdstan independently and tell cmdstanr where it is by call
+## `cmdstanr::set_cmdstan_path()`.
+cmdstanr::install_cmdstan()
 ```

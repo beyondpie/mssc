@@ -13,16 +13,14 @@
 #' }
 #' @source A public PBMC single-cell RNA sequencing data
 
+library(mssc)
+
 pbmc <- readRDS(system.file("extdata", "refPBMC.rds", package = "mssc", mustWork = TRUE))
 nind <- max(pbmc$ind)
-model <- High2$new(
-  stan_snb_path = here::here("src", "mssc", "stan", "snb.stan"),
-  stan_high2_path = here::here("src", "mssc", "stan", "mssc_2-0.stan"),
-  stan_glm_path = here::here("src", "mssc", "stan", "glm.stan"),
-  nind = nind,
-  tol_rel_obj = 0.0001,
-  adapt_engaged = FALSE
-)
+
+## it takes some time (around several minitutes) to let cmdstanr compile mssc2 stan script.
+model <- new_MSSC2(modelpath = system.file("stan", "mssc2.stan", package = "mssc", mustWork = TRUE),
+                   glmodelpath = system.file("stan", "glm.stan", package = "mssc", mustWork = TRUE))
 
 init_params <- model$init_params(
   cnt = pbmc$y2c[1:10, ],

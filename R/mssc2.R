@@ -66,7 +66,7 @@ new_MSSC2 <- function(modelpath = NULL, glmodelpath = NULL, seed = 1L) {
 
   ## only compile model. glm need to be explicitly compiled when in use.
   r$model <- compileStanModel(
-    model_path = r$model_path,
+    model_path = r$modelpath,
     use_thread = NULL,
     use_mpi = NULL, use_opencl = NULL
   )
