@@ -66,13 +66,13 @@ getNameOfVectorFromCmdstanr <- function(nm = "MuInd", n = 10L, l = "[", r = "]")
 #' @return vector of string
 #' @export
 getNameOfMatrixFromCmdstanr <- function(nm = "MuInd", nr, nc, l = "[", r = "]") {
-  r <- rep("", nr * nc)
+  result <- rep("", nr * nc)
   for (i in 1:nr) {
     for (j in 1:nc) {
-      r[nc * (i - 1) + j] <- paste0(nm, l, i, ",", j, r)
+      result[nc * (i - 1) + j] <- paste0(nm, l, i, ",", j, r)
     }
   }
-  invisible(r)
+  invisible(result)
 }
 
 #' Replicate a vector in row-wise for n times.

@@ -26,36 +26,35 @@ mssc <- initMSSC2GenewiseParams(mssc2 = mssc, cnt = pbmc$y2c[1:10,], s = pbmc$s,
                                 cond = pbmc$cond, ind = pbmc$ind)
 mssc <- setStanHyperparams(mssc2 = mssc)
 mssc <- setStanInitialParams(mssc2 = mssc)
-## init_params <- model$init_params(
-##   cnt = pbmc$y2c[1:10, ],
-##   s = pbmc$s,
-##   cond = pbmc$cond,
-##   ind = pbmc$ind
-## )
+data <- toStanInput(cnt = pbmc$y2c[1:10, ], s = pbmc$s, cond = pbmc$cond,
+                    ind = pbmc$ind, hp = mssc$modelhp)
 
-data <- 
+## still need to compile.
+mssc$model$compile()
+## run variational inference
+mssc <- runVI(mssc2 = mssc, data = data)
+## run MAP
+## A bug: when mssc is updated, we need to re-compile.
+mssc$model$compile()
+mssc <- runMAP(mssc2 = mssc, data = data)
 
-data <- model$to_model_data(
-  cnt = pbmc$y2c[1:10, ],
-  s = pbmc$s,
-  cond = pbmc$cond,
-  ind = pbmc$ind,
-  hp = init_params$hp
-)
+## analysis
+vi_est_params <- extractDrawsAll(mssc2 = mssc,
+                                 genenms = rownames(pbmc$y2c[1:10,]),
+                                 method = "vi")
+str(vi_est_params)
+opt_est_params <- extractDrawsAll(mssc2 = mssc,
+                                  genenms = rownames(pbmc$y2c[1:10,]),
+                                  method = "opt")
+vi_mucond <- extractDraws(mssc2 = mssc, param = "mucond",
+                       genenms = rownames(pbmc$y2c[1:10, ]),
+                       method = "vi")
+opt_mucond <- extractDraws(mssc2 = mssc, param = "mucond",
+                       genenms = rownames(pbmc$y2c[1:10, ]),
+                       method = "opt")
 
-## variational inference
-model$run(data = data, list_wrap_ip = list(init_params$ip))
 
-est_params <- model$extract_draws_all(
-  ngene = 10,
-  genenms = rownames(pbmc$y2c[1:10, ])
-)
-str(est_params)
 
-mucond <- model$extract_draws(
-  param = "mucond", ngene = 10,
-  genenms = rownames(pbmc$y2c[1:10, ])
-)
 rankings <- model$get_ranking_statistics(
   mucond = mucond,
   two_hot_vec = c(1, -1)
@@ -64,26 +63,6 @@ str(rankings)
 
 psis <- model$psis()
 print(psis$psis)
-rankings <- model$get_ranking_statistics(
-  mucond = mucond,
-  two_hot_vec = c(1, -1)
-)
-str(rankings)
-
-## optimization
-model$run_opt(data = data, list_wrap_ip = list(init_params$ip))
-est_params <- model$extract_draws_all(
-  ngene = 10,
-  genenms = rownames(pbmc$y2c[1:10, ]),
-  method = "opt"
-)
-str(est_params)
-
-mucond <- model$extract_draws(
-  param = "mucond", ngene = 10,
-  genenms = rownames(pbmc$y2c[1:10, ]),
-  method = "opt"
-)
 rankings <- model$get_ranking_statistics(
   mucond = mucond,
   two_hot_vec = c(1, -1)

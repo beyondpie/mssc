@@ -408,8 +408,8 @@ extractDrawsAll <- function(mssc2, genenms = NULL, method = "vi") {
   if (is.null(fit)) {
     stop(paste(method, " is null. Might becuase it hasn't been run or have troubles."))
   }
-  est_params <- lapply(mssc2$allparams, function(nm) {
-    extractDraws(mssc2 = mssc2, genenms = nm, method = method)
+  est_params <- lapply(mssc2$allparams, function(param) {
+    extractDraws(mssc2 = mssc2, param = param, genenms = genenms, method = method)
   })
   names(est_params) <- mssc2$allparams
   invisible(est_params)
