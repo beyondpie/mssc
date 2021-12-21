@@ -27,4 +27,16 @@ if(!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 remotes::install_github("beyondpie/mssc")
+## mssc => cmdstanr => cmdstan  (=>: depends on)
+## so we also need to install cmdstan, which is not an R packge, but cmdline Stan tool.
+## Prefer to use cmdstanr to install it since cmdstanr will then remember where the cmdstan is,
+## otherwise you have to install cmdstan independently and tell cmdstanr where it is by call
+## `cmdstanr::set_cmdstan_path()`.
+cmdstanr::install_cmdstan()
 ```
+
+## Test
+
+    ## test.R script can be got from the package.
+    test_script = system.file("rscript", "test.R", package = "mssc", mustWork = TRUE)
+    ## then you can run this script to test if you can run mssc without errors.
