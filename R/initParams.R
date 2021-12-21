@@ -7,7 +7,7 @@
 #' @return numeric scalar
 #' @export
 normLogMean <- function(y, s) {
-  if (any(y) < 0) {
+  if (any(y < 0)) {
     stop("numeric vector y should be no less than zero.")
   }
   if (sum(y) == 0) {
@@ -16,7 +16,7 @@ normLogMean <- function(y, s) {
   if (any(s <= 0)) {
     stop("normalizing constant s should be all larger than zero.")
   }
-  mu <- log(stats::mean(y)) - log(stats::median(s))
+  mu <- log(mean(y)) - log(stats::median(s))
   invisible(mu)
 }
 
@@ -66,7 +66,7 @@ initNBParamWithCondBatch <- function(y, s, cond, ind,
     mucond = rep(0.0, ncond),
     muind = rep(0.0, nind)
   )
-  if (any(y) < 0) {
+  if (any(y < 0)) {
     stop("numeric vector y should be no less than zero.")
   }
   if (sum(y) == 0) {
@@ -237,7 +237,7 @@ fitGenewiseNBModel <- function(cnt, s, cond, ind,
                                default_mu = 0.0, default_r = 20,
                                min_var = 4.0, min_varofcond = 0.25,
                                min_varofind = 0.25, min_tau2 = 0.25) {
-  if (any(s) == 0) {
+  if (any(s == 0)) {
     stop("Normalizing factor s should have no zeros.")
   }
   ncond <- max(cond)

@@ -104,7 +104,7 @@ initMSSC2GenewiseParams <- function(mssc2, cnt, s, cond, ind) {
   m$ncell <- ncol(cnt)
   m$ncond <- max(cond)
   m$nind <- max(ind)
-  invisible(mssc2)
+  invisible(m)
 }
 
 #' Set hyper parameters for the stan model of mssc2.
