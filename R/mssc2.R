@@ -552,7 +552,7 @@ runGLMAP <- function(mssc2, data) {
   if (is.null(mssc2$glmodel)) {
     stop("mssc2 model has not been compiled.")
   }
-  if (is.null(mssc2$gmlip)) {
+  if (is.null(mssc2$glmip)) {
     stop("mssc2 hasn't initialize the parameters.")
   }
   sp <- mssc2$stanparams
@@ -561,8 +561,8 @@ runGLMAP <- function(mssc2, data) {
     init = list(mssc2$glmip),
     seed = mssc2$seed,
     refresh = sp$opt_refresh,
-    max_iter = sp$opt_max_iter,
-    opt_method = sp$opt_metod,
+    iter = sp$opt_max_iter,
+    algorithm = sp$opt_method,
     init_alpha = sp$init_alpha,
     tol_obj = sp$tol_obj,
     tol_rel_obj = sp$tol_rel_obj,
@@ -647,8 +647,8 @@ extractGLMDrawsAll <- function(mssc2, genenms = NULL, method = "opt") {
   if (is.null(fit)) {
     stop(paste(method, " is null. Might becuase it hasn't been run or have troubles."))
   }
-  est_params <- lapply(mssc2$allparamsglm, function(nm) {
-    extractGLMDraws(mssc2 = mssc2, genenms = genenms, method = method)
+  est_params <- lapply(mssc2$allparamsglm, function(param) {
+    extractGLMDraws(mssc2 = mssc2, param = param, genenms = genenms, method = method)
   })
   names(est_params) <- mssc2$allparamsglm
   invisible(est_params)

@@ -53,7 +53,10 @@ opt_mucond <- extractDraws(mssc2 = mssc, param = "mucond",
                        genenms = rownames(pbmc$y2c[1:10, ]),
                        method = "opt")
 
-
+mucond_deltamean <- evalDeltaMean(mucond = vi_mucond,
+                                  twoHotVec = c(1,-1))
+mucond_tstat <- evalTstat(mucond = vi_mucond,
+                          twoHotVec = c(1,-1))
 
 rankings <- model$get_ranking_statistics(
   mucond = mucond,
@@ -61,27 +64,20 @@ rankings <- model$get_ranking_statistics(
 )
 str(rankings)
 
-psis <- model$psis()
-print(psis$psis)
-rankings <- model$get_ranking_statistics(
-  mucond = mucond,
-  two_hot_vec = c(1, -1)
-)
-str(rankings)
+## test PSIS
+psis <- PSIS(mssc2 = mssc, takelog = FALSE, donormalize = TRUE)
 
 ## test glm
-init_params_of_glm <- model$init_glm_params(cnt = pbmc$y2c[1:10,],
-                                            s = pbmc$s,
-                                            cond = pbmc$cond,
-                                            ind = pbmc$ind)
-model$run_glm_opt(data = data, list_wrap_ip = list(init_params_of_glm))
-est_params_of_glm <- model$extract_draws_all_from_glm
+mssc$glmodel <- compileStanModel(model_path = mssc$glmodelpath)
+mssc <- setGLMInitialParams(mssc2 = mssc)
+mssc$glmodel$compile()
+mssc <- runGLMAP(mssc2 = mssc, data = data)
+
+glm_est_params <- extractGLMDrawsAll(mssc2 = mssc,
+                                     genenms = rownames(pbmc$y2c[1:10, ]))
+glm_mucond <- extractGLMDraws(mssc2 = mssc, param = "mucond",
+                             genenms = rownames(pbmc$y2c[1:10, ]))
 mucond_of_glm <- model$extract_draws_from_glm(
   param = "mucond", ngene = 10,
   genenms = rownames(pbmc$y2c[1:10, ])
 )
-ranking_from_glm <- model$get_opt_ranking_statistic(
-  mucond = mucond_of_glm,
-  two_hot_vec = c(1, -1)
-)
-str(ranking_from_glm)
