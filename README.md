@@ -23,6 +23,11 @@ linear models.
 ## Installation
 
 ``` r
+## install cmdstanr firslty.
+## directly use install.package("cmdstanr") may face error.
+install.packages("cmdstanr",
+                 repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+## then install mssc
 if(!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
