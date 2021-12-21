@@ -47,8 +47,11 @@ cmdstanr::install_cmdstan()
 ```
 
 ## Test
+The test script can be download here: 
+https://github.com/beyondpie/mssc/blob/main/inst/rscript/test.R.
+You can also use the command line below to find the script.
 ```r
 ## test.R script can be got from the package.
 test_script = system.file("rscript", "test.R", package = "mssc", mustWork = TRUE)
-## then you can run this script to test if you can run mssc without errors.
 ```
+Then you can run this script to test if you can run mssc without errors.
