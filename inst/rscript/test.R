@@ -29,13 +29,14 @@ mssc <- setStanInitialParams(mssc2 = mssc)
 data <- toStanInput(cnt = pbmc$y2c[1:10, ], s = pbmc$s, cond = pbmc$cond,
                     ind = pbmc$ind, hp = mssc$modelhp)
 
-## still need to compile.
+## May still need to compile.
+## On my mac, I need to re-compile, but on my Ubuntu, I don't need to.
 mssc$model$compile()
 ## run variational inference
 mssc <- runVI(mssc2 = mssc, data = data)
 ## run MAP
-## A bug: when mssc is updated, we need to re-compile.
-mssc$model$compile()
+## when mssc is updated, we might need to re-compile.
+## mssc$model$compile()
 mssc <- runMAP(mssc2 = mssc, data = data)
 
 ## analysis
@@ -58,26 +59,17 @@ mucond_deltamean <- evalDeltaMean(mucond = vi_mucond,
 mucond_tstat <- evalTstat(mucond = vi_mucond,
                           twoHotVec = c(1,-1))
 
-rankings <- model$get_ranking_statistics(
-  mucond = mucond,
-  two_hot_vec = c(1, -1)
-)
-str(rankings)
-
 ## test PSIS
 psis <- PSIS(mssc2 = mssc, takelog = FALSE, donormalize = TRUE)
 
 ## test glm
 mssc$glmodel <- compileStanModel(model_path = mssc$glmodelpath)
 mssc <- setGLMInitialParams(mssc2 = mssc)
-mssc$glmodel$compile()
+## might need to re-compile()
+## mssc$glmodel$compile()
 mssc <- runGLMAP(mssc2 = mssc, data = data)
 
 glm_est_params <- extractGLMDrawsAll(mssc2 = mssc,
                                      genenms = rownames(pbmc$y2c[1:10, ]))
 glm_mucond <- extractGLMDraws(mssc2 = mssc, param = "mucond",
                              genenms = rownames(pbmc$y2c[1:10, ]))
-mucond_of_glm <- model$extract_draws_from_glm(
-  param = "mucond", ngene = 10,
-  genenms = rownames(pbmc$y2c[1:10, ])
-)
