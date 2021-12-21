@@ -6,6 +6,15 @@
 \usage{
 new_MSSC2(modelpath = NULL, glmodelpath = NULL, seed = 1L)
 }
+\arguments{
+\item{modelpath}{string, mssc2 stan script path
+use system.file("stan", "mssc2.stan", package = "mssc", mustWork=TRUE) to get the script.}
+
+\item{glmodelpath}{string glmodelpath, glm stan script path
+use system.file("stan", "glm.stan", package = "mssc", mustWork=TRUE) to get the script.}
+
+\item{seed}{int, default is 1.}
+}
 \value{
 MSSC2 object
 }

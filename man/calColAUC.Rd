@@ -14,7 +14,7 @@ calColAUC(stats, c1, c2)
 \item{c2}{integer vector, index of genes for condition -1}
 }
 \value{
-numeric vector, within \link{0,1}, AUCs for different measurements.
+numeric vector, within 0-1 region, AUCs for different measurements.
 }
 \description{
 Calculate AUCs for stats in colume-wise.

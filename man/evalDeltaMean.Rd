@@ -9,7 +9,7 @@ evalDeltaMean(mucond, twoHotVec)
 \arguments{
 \item{mucond}{3-dim arrays, nsample by ngene by ncond}
 
-\item{twoHotVector}{integer vector, like (1,-1) or (0, 0, -1, 1, 0),
+\item{twoHotVec}{integer vector, like (1,-1) or (0, 0, -1, 1, 0),
 the two conditions we want to compare, one is 1 and the other is -1.}
 }
 \value{

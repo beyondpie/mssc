@@ -44,8 +44,12 @@ initNBParam <- function(y, s, min_r) {
 #' Fit mu, mucond, muind for Negative Binomial with scaling.
 #' No more Stan script based.
 #' NOTE previous name: fit_mgsnb
+#' @param y numeric vector, should be not all zeros.
+#' @param s numeric vector, normalizing constant, should no zeros.
 #' @param cond vector of integer, start from 1
 #' @param ind vector of integer, start from 1
+#' @param default_mu double, default is 0.0.
+#' @param default_r double, default is 20.
 #' @return list of four-named element, mu, r, mucond, muind
 #' mu and r are scalars.
 #' mucond is a vector length of number of conditions, usually 2.
@@ -216,6 +220,12 @@ fitGenewiseBatchPriorParams <- function(muind,
 #' start from 1.
 #' @param ind integer vector, length of ncell, which individuals cells belong to,
 #' start from 1.
+#' @param default_mu double, default is 0.0
+#' @param default_r double, default is 20.
+#' @param min_var double, default is 4.0
+#' @param min_varofcond double, default is 0.25
+#' @param min_varofind double, default is 0.25
+#' @param min_tau2 double, default is 0.25
 #' @return list of four elements
 #' - mgsnb: matrix, ngene by 2 + ncond + nind
 #' - mu: output of fitGeneGlobalMeanPriorParams

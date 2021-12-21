@@ -9,9 +9,17 @@ NOTE previous name: fit_mgsnb}
 initNBParamWithCondBatch(y, s, cond, ind, default_mu = 0, default_r = 20)
 }
 \arguments{
+\item{y}{numeric vector, should be not all zeros.}
+
+\item{s}{numeric vector, normalizing constant, should no zeros.}
+
 \item{cond}{vector of integer, start from 1}
 
 \item{ind}{vector of integer, start from 1}
+
+\item{default_mu}{double, default is 0.0.}
+
+\item{default_r}{double, default is 20.}
 }
 \value{
 list of four-named element, mu, r, mucond, muind

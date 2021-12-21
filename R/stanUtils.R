@@ -53,7 +53,7 @@ compileStanModel <- function(model_path,
 #' @export
 getNameOfVectorFromCmdstanr <- function(nm = "MuInd", n = 10L, l = "[", r = "]") {
   invisible(vapply(seq_len(n), function(i) {
-    paste0(nm, ls, i, rs)
+    paste0(nm, l, i, r)
   }, FUN.VALUE = "MuInd[1]"))
 }
 
@@ -65,11 +65,11 @@ getNameOfVectorFromCmdstanr <- function(nm = "MuInd", n = 10L, l = "[", r = "]")
 #' @param r string, right brackt, default "]"
 #' @return vector of string
 #' @export
-getNameOfMatrixFromCmdstanr <- function(nm = "MuInd", nr, nc, l = "[",r = "]") {
+getNameOfMatrixFromCmdstanr <- function(nm = "MuInd", nr, nc, l = "[", r = "]") {
   r <- rep("", nr * nc)
   for (i in 1:nr) {
     for (j in 1:nc) {
-      r[nc * (i - 1) + j] <- paste0(nm, ls, i, ",", j, rs)
+      r[nc * (i - 1) + j] <- paste0(nm, l, i, ",", j, r)
     }
   }
   invisible(r)

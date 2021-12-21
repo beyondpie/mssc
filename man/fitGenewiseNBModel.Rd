@@ -28,6 +28,18 @@ start from 1.}
 
 \item{ind}{integer vector, length of ncell, which individuals cells belong to,
 start from 1.}
+
+\item{default_mu}{double, default is 0.0}
+
+\item{default_r}{double, default is 20.}
+
+\item{min_var}{double, default is 4.0}
+
+\item{min_varofcond}{double, default is 0.25}
+
+\item{min_varofind}{double, default is 0.25}
+
+\item{min_tau2}{double, default is 0.25}
 }
 \value{
 list of four elements
