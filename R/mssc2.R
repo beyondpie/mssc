@@ -128,7 +128,7 @@ setStanHyperparams <- function(mssc2) {
     hp_tau2 = init_mgsnb$ind$est_tau2[2:3]
   )
   ## create a new mssc2 object
-  mssc2$hp <- hp
+  mssc2$modelhp <- hp
   invisible(mssc2)
 }
 

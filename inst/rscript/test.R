@@ -19,15 +19,21 @@ pbmc <- readRDS(system.file("extdata", "refPBMC.rds", package = "mssc", mustWork
 nind <- max(pbmc$ind)
 
 ## it takes some time (around several minitutes) to let cmdstanr compile mssc2 stan script.
-model <- new_MSSC2(modelpath = system.file("stan", "mssc2.stan", package = "mssc", mustWork = TRUE),
+mssc <- new_MSSC2(modelpath = system.file("stan", "mssc2.stan", package = "mssc", mustWork = TRUE),
                    glmodelpath = system.file("stan", "glm.stan", package = "mssc", mustWork = TRUE))
 
-init_params <- model$init_params(
-  cnt = pbmc$y2c[1:10, ],
-  s = pbmc$s,
-  cond = pbmc$cond,
-  ind = pbmc$ind
-)
+mssc <- initMSSC2GenewiseParams(mssc2 = mssc, cnt = pbmc$y2c[1:10,], s = pbmc$s,
+                                cond = pbmc$cond, ind = pbmc$ind)
+mssc <- setStanHyperparams(mssc2 = mssc)
+mssc <- setStanInitialParams(mssc2 = mssc)
+## init_params <- model$init_params(
+##   cnt = pbmc$y2c[1:10, ],
+##   s = pbmc$s,
+##   cond = pbmc$cond,
+##   ind = pbmc$ind
+## )
+
+data <- 
 
 data <- model$to_model_data(
   cnt = pbmc$y2c[1:10, ],
