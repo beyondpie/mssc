@@ -42,6 +42,8 @@ cmdstanr::install_cmdstan()
 
 ## Test
 
-    ## test.R script can be got from the package.
-    test_script = system.file("rscript", "test.R", package = "mssc", mustWork = TRUE)
-    ## then you can run this script to test if you can run mssc without errors.
+``` r
+## test.R script can be got from the package.
+test_script = system.file("rscript", "test.R", package = "mssc", mustWork = TRUE)
+## then you can run this script to test if you can run mssc without errors.
+```
