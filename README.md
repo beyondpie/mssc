@@ -44,7 +44,7 @@ cmdstanr::install_cmdstan()
 
 The test script can be download here:
 <https://github.com/beyondpie/mssc/blob/main/inst/rscript/test.R>. You
-can also use the command line below to find the script.
+can also use the R command below to find the script.
 
 ``` r
 ## test.R script can be got from the package.
