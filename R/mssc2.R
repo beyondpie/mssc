@@ -278,7 +278,7 @@ runMAP <- function(mssc2, data) {
     seed = mssc2$seed,
     refresh = sp$opt_refresh,
     iter = sp$opt_max_iter,
-    algorithm = sp$opt_metod,
+    algorithm = sp$opt_method,
     init_alpha = sp$init_alpha,
     tol_obj = sp$tol_obj,
     tol_rel_obj = sp$tol_rel_obj,
