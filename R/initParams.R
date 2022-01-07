@@ -28,16 +28,16 @@ normLogMean <- function(y, s) {
 #' then r tends to be estimated too small.
 #' @param y numeric vector, should be not all zeros.
 #' @param s numeric vector, normalizing constant, should no zeros.
-#' @param min_r numeric scalar, dispersion lower threshold.
+#' @param default_r numeric scalar, when variance larger than m, it will be used.
 #' @return list of two-named scalar, mu and r
 #' @export
-initNBParam <- function(y, s, min_r) {
+initNBParam <- function(y, s, default_r) {
   mu <- normLogMean(y = y, s = s)
   ## v equals to m + m^2/r
   v <- stats::var(y)
   m <- mean(y)
   ## dispersion
-  r <- ifelse(v > m, m^2 / (v - m), min_r)
+  r <- ifelse(v > m, m^2 / (v - m), default_r)
   invisible(list(mu = mu, r = r))
 }
 
@@ -77,7 +77,7 @@ initNBParamWithCondBatch <- function(y, s, cond, ind,
     return(invisible(result))
   }
 
-  init_mur <- initNBParam(y, s)
+  init_mur <- initNBParam(y, s, default_r = default_r)
   result$mu <- init_mur$mu
   result$r <- init_mur$r
 
