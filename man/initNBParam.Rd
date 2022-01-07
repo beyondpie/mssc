@@ -5,14 +5,14 @@
 \title{Get the mu (log-level mean) and r (dispersion) in Negative Binomial with scaling.
 dispersion is defined as the same as in either in R or Stan.}
 \usage{
-initNBParam(y, s, min_r)
+initNBParam(y, s, default_r)
 }
 \arguments{
 \item{y}{numeric vector, should be not all zeros.}
 
 \item{s}{numeric vector, normalizing constant, should no zeros.}
 
-\item{min_r}{numeric scalar, dispersion lower threshold.}
+\item{default_r}{numeric scalar, when variance larger than m, it will be used.}
 }
 \value{
 list of two-named scalar, mu and r
